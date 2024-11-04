@@ -1,14 +1,16 @@
 # First stage: build the executable.
-FROM golang:1.16 as builder
+FROM golang:1.23 AS builder
+
 WORKDIR /go/src/github.com/rekzi/clamav-prometheus-exporter/
 COPY . .
-# CGO_ENABLED=0 to build a statically-linked executable
 
 ENV CGO_ENABLED=0
 RUN go build -installsuffix 'static' -o clamav-prometheus-exporter .
 
 # Final stage: the running container.
-FROM alpine:3.13.2 AS final
+FROM alpine:3.20 AS final
+
+# hadolint ignore=DL3018
 RUN apk add --update --no-cache ca-certificates
 WORKDIR /bin/
 # Import the compiled executable from the first stage.
